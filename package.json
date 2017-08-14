@@ -25,7 +25,8 @@
     "react-form-material-ui": "^1.2.0",
     "react-native": "^0.46.1",
     "react-native-material-kit": "^0.4.1",
-    "react-native-material-ui": "^1.12.0"
+    "react-native-material-ui": "^1.12.0",
+    "react-navigation": "^1.0.0-beta.11"
   },
   "rnpm": {
     "assets": [

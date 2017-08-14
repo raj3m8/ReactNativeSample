@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, AppRegistry } from 'react-native';
 import { BottomNavigation, COLOR, ThemeProvider, Button } from 'react-native-material-ui';
+import PropTypes from 'prop-types';
+import { StackNavigator } from 'react-navigation';
 
 const MK = require('react-native-material-kit');
 const {
@@ -8,41 +10,45 @@ const {
 } = MK;
 
 const uiTheme = {
-    palette: {
-        primaryColor: COLOR.green500,
+  palette: {
+    primaryColor: COLOR.green500,
+  },
+  toolbar: {
+    container: {
+      height: 50,
     },
-    toolbar: {
-        container: {
-            height: 50,
-        },
-    },
+  },
 };
 
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <ThemeProvider uiTheme={uiTheme}>
-        <View style={styles.container}>
-          <View style={styles.contentContainer}>
-            <HomePage />
-          </View>
-          <View style={styles.navBar}>
-            <BottomNav/>
-          </View>
-        </View>
-      </ThemeProvider>
-    );
-  }
-}
+// export default class App extends React.Component {
+//   render() {
+//     return (
+//       <ThemeProvider uiTheme={uiTheme}>
+//         <View style={styles.container}>
+//           <View style={styles.contentContainer}>
+            
+//           </View>
+//           <View style={styles.navBar}>
+//             <BottomNav/>
+//           </View>
+//         </View>
+//       </ThemeProvider>
+//     );
+//   }
+// }
 
-class HomePage extends React.Component {
+class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
     this.handleChange = this.handleChange.bind(this);
     this.searchSummoners = this.searchSummoners.bind(this);
   }
+
+  static navigationOptions = {
+    title: 'Welcome',
+  };
 
   searchSummoners() {
     const parent = this;
@@ -54,17 +60,6 @@ class HomePage extends React.Component {
     .then((responseJson) => {
       parent.setState({ summoner_data: responseJson.data })
     })
-
-
-    // fetch('http://localhost:8080/api/summoner/'+this.state.summoner_name, {
-    //   method: 'GET'
-    // }).then(function(response) {
-    //   console.log(456)
-    //   return response.json();
-    // }).then(function(response) {
-    //   console.log(response)
-    //   parent.setState({ summoner_data: response })
-    // });
   }
 
   handleChange(e) {
@@ -94,27 +89,33 @@ class BottomNav extends React.Component {
     return (
       <BottomNavigation active={this.state.active} hidden={false}>
         <BottomNavigation.Action
-          key="today"
+          key="home"
           icon="home"
           label="Home"
-          onPress={() => this.setState({ active: 'today' })}
+          onPress={() => this.setState({ active: 'home' })}
         />
         <BottomNavigation.Action
-          key="people"
-          icon="people"
+          key="items"
+          icon="pages"
           label="Items"
-          onPress={() => this.setState({ active: 'people' })}
+          onPress={() => this.setState({ active: 'items' })}
         />
         <BottomNavigation.Action
-          key="bookmark-border"
-          icon="bookmark-border"
+          key="profile"
+          icon="face"
           label="Profile"
-          onPress={() => this.setState({ active: 'bookmark-border' })}
+          onPress={() => this.setState({ active: 'profile' })}
         />
       </BottomNavigation>
     )
   }  
 }
+
+const App = StackNavigator({
+  Home: { screen: HomeScreen },
+});
+
+AppRegistry.registerComponent('SimpleApp', () => SimpleApp);
 
 const styles = StyleSheet.create({
   container: {
