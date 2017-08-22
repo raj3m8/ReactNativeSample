@@ -1,8 +1,16 @@
-import React from 'react';
-import { StyleSheet, Text, View, Image, AppRegistry } from 'react-native';
+import React, { Component, PropTypes } from 'react';
+import { StyleSheet, Text, View, Image, AppRegistry, NavigatorIOS, FlatList, ImageBackground } from 'react-native';
 import { BottomNavigation, COLOR, ThemeProvider, Button } from 'react-native-material-ui';
-import PropTypes from 'prop-types';
 import { StackNavigator } from 'react-navigation';
+import { setCustomText } from 'react-native-global-props';
+import { Font } from 'expo';
+
+const customTextProps = {
+  style: {
+    fontFamily: 'Arial'
+  }
+}
+setCustomText(customTextProps);
 
 const MK = require('react-native-material-kit');
 const {
@@ -20,45 +28,56 @@ const uiTheme = {
   },
 };
 
+function championNameFormat(champion) {
+  var formatChampName = champion.toLowerCase().replace(/'/g,"")
+  return formatChampName.charAt(0).toUpperCase() + formatChampName.slice(1);
+}
 
-// export default class App extends React.Component {
-//   render() {
-//     return (
-//       <ThemeProvider uiTheme={uiTheme}>
-//         <View style={styles.container}>
-//           <View style={styles.contentContainer}>
-            
-//           </View>
-//           <View style={styles.navBar}>
-//             <BottomNav/>
-//           </View>
-//         </View>
-//       </ThemeProvider>
-//     );
-//   }
-// }
 
-class HomeScreen extends React.Component {
+export default class App extends Component {
+  render() {
+    return (
+      <NavigatorIOS
+        initialRoute={{
+          component: HomeScreen,
+          title: 'Home',
+        }}
+        style={{flex: 1}}
+      />
+    );
+  }
+}
+
+class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {};
     this.handleChange = this.handleChange.bind(this);
-    this.searchSummoners = this.searchSummoners.bind(this);
+    this._onSearch = this._onSearch.bind(this);
   }
 
-  static navigationOptions = {
-    title: 'Welcome',
-  };
+  static propTypes = {
+    navigator: PropTypes.object.isRequired,
+  }
 
-  searchSummoners() {
+  _onSearch() {
     const parent = this;
-    console.log(123);
     fetch('http://localhost:8080/api/summoner/'+this.state.summoner_name, {
       method: 'GET'
     })
     .then((response) => response.json())
     .then((responseJson) => {
-      parent.setState({ summoner_data: responseJson.data })
+      console.log(responseJson);
+
+      this.props.navigator.push({
+        title: parent.state.summoner_name,
+        component: SummonerSearchResults,
+        passProps: {
+          match_data: responseJson.match_data, 
+          summoner_ranks: responseJson.summoner_ranks,
+          champ_masteries: responseJson.champ_masteries
+        }
+      });
     })
   }
 
@@ -67,22 +86,171 @@ class HomeScreen extends React.Component {
   }
 
   render() {
+    return ( 
+      <ThemeProvider uiTheme={uiTheme}>
+        <ImageBackground style={styles.container} source={require("./assets/images/bg.jpg")}>
+          <View style={styles.contentContainer}>
+            <Image source={require("./assets/images/lol_logo.png")} style={styles.homeLogo} />
+            <MKTextField onChangeText={ this.handleChange } style={styles.summonerSearchField} textInputStyle={{color: '#ddd'}} placeholder="Summoner Name..." />
+            <Button raised primary text="Search" onPress={this._onSearch} />
+          </View>
+          <View style={styles.navBar}>
+            <BottomNav/>
+          </View>
+        </ImageBackground>
+      </ThemeProvider>
+    )
+  }
+}
+
+class ChampionMasteries extends Component {
+  render() {
+    var champ_rank_image = require("./assets/images/badges/UNRANKED.png")
+    if (this.props.champion['championLevel'] == 1) { champ_rank_image = require("./assets/images/champ_mastery/cm1.png") }
+    if (this.props.champion['championLevel'] == 2) { champ_rank_image = require("./assets/images/champ_mastery/cm2.png") }
+    if (this.props.champion['championLevel'] == 3) { champ_rank_image = require("./assets/images/champ_mastery/cm3.png") }
+    if (this.props.champion['championLevel'] == 4) { champ_rank_image = require("./assets/images/champ_mastery/cm4.png") }
+    if (this.props.champion['championLevel'] == 5) { champ_rank_image = require("./assets/images/champ_mastery/cm5.png") }
+    if (this.props.champion['championLevel'] == 6) { champ_rank_image = require("./assets/images/champ_mastery/cm6.png") }
+    if (this.props.champion['championLevel'] == 7) { champ_rank_image = require("./assets/images/champ_mastery/cm7.png") }
+
     return (
-      <View>
-        <Image source={require("./assets/images/lol_logo.png")} style={styles.homeLogo} />
-        <MKTextField onChangeText={ this.handleChange } placeholder="Summoner Name..." />
-        <Button raised primary text="Search" onPress={this.searchSummoners} />
-        <Text>{JSON.stringify(this.state.summoner_data)}</Text>
+      <View style={{flexDirection: 'column', paddingTop: 8, paddingBottom: 8, flex:0.18, paddingLeft: 8, alignItems: 'center'}}>
+        <Image style={{height: 60, width: 60, borderRadius: 30, borderWidth: 3, borderColor: '#cab546'}} source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.10.1/img/champion/'+championNameFormat(this.props.champion['champion'])+'.png'}} />
+        <Image source={champ_rank_image} style={{width: 60, height: 60, marginTop: -22}}/>
+        <Text style={{fontWeight: "700"}}>Level {this.props.champion['championLevel']}</Text>
+        <Text style={{fontWeight: "700"}}>{this.props.champion['championPoints']}</Text>
       </View>
     )
   }
 }
 
-class BottomNav extends React.Component {
+class MatchListItems extends Component {
+  _renderItem = ({item}) => (
+    <View style={[styles.itemContainer,{backgroundColor: item['win'] == 'Win' ? '#7edab5' : '#f5aab2'}]}>
+      <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.10.1/img/champion/'+championNameFormat(item['champion'])+'.png'}} style={{width: 70, height: 70}} />
+      <View style={{flexDirection: 'column', alignSelf: 'stretch', flex: 1}}>
+        <View style={{flexDirection: 'row'}}>
+          <View style={{flexDirection: 'column', flex: 0.34}}>
+            <Text style={itemListStyles.kda}>{item['kda']['kills']} / {item['kda']['deaths']} / {item['kda']['assists']}</Text>
+            <Text style={itemListStyles.gameMode}>{item['gameMode']}</Text>
+            <Text style={itemListStyles.gameMode}>{item['gameDuration']}</Text>
+          </View>
+          <View style={{flexDirection: 'column', flex: 1}}>
+            <View style={{justifyContent: 'flex-end', flexDirection: 'row', flex: 1}}>
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item0']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item1']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item2']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item3']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item4']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item5']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item6']+'.png'}} style={styles.itemIcon} />
+            </View>
+            <View style={{flexDirection: 'row', paddingLeft: 70, marginTop: 4}}>
+              <Text style={{fontWeight: "700"}}>{item['stats']['totalMinionsKilled']+item['stats']['neutralMinionsKilled']}</Text>
+              <Image source={require("./assets/images/cs.png")} style={{marginTop: 2, marginLeft: 3}}/>
+              <Text style={{marginLeft: 20, fontWeight: "700"}}>{item['stats']['goldEarned']}</Text>
+              <Image source={require("./assets/images/coin.png")} style={{marginTop: 2, marginLeft: 3}}/>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+
+  _keyExtractor = (item, index) => item['gameId'];
+
+  render() {
+    return (
+      <FlatList 
+        data={this.props.match_data} 
+        renderItem={this._renderItem} 
+        keyExtractor={this._keyExtractor}
+      />
+    )
+  }
+}
+
+class SummonerSearchResults extends Component {
   constructor(props) {
     super(props);
     this.state = {};
-    //this.handleChange = this.handleChange.bind(this);
+  }
+
+  render() {
+    return (
+      <ThemeProvider uiTheme={uiTheme}>
+        <ImageBackground style={[styles.container,styles.itemListContainer]} source={require("./assets/images/bg.jpg")}>
+          <View style={{flexDirection: 'row', marginLeft: 5, marginRight: 5, backgroundColor: 'rgba(52, 52, 52, 0.2)'}}>
+            <SummonerRank rank={this.props.summoner_ranks['Solo/Duo']} queue='Solo/Duo' />
+            <SummonerRank rank={this.props.summoner_ranks['Flex5v5']} queue='Flex5v5' />
+            <SummonerRank rank={this.props.summoner_ranks['Flex3v3']} queue='Flex3v3' />
+          </View>
+          <View style={{flexDirection: 'row', margin: 5, backgroundColor: 'rgba(52, 52, 52, 0.2)'}}>
+            {this.props.champ_masteries.length > 0 && <ChampionMasteries champion={this.props.champ_masteries[0]} /> }
+            {this.props.champ_masteries.length > 1 && <ChampionMasteries champion={this.props.champ_masteries[1]} /> }
+            {this.props.champ_masteries.length > 2 && <ChampionMasteries champion={this.props.champ_masteries[2]} /> }
+            {this.props.champ_masteries.length > 3 && <ChampionMasteries champion={this.props.champ_masteries[3]} /> }
+            {this.props.champ_masteries.length > 4 && <ChampionMasteries champion={this.props.champ_masteries[4]} /> }
+          </View>
+          <View style={styles.champListContainer}>
+            <MatchListItems match_data={this.props.match_data}/>
+          </View>
+          <View style={styles.navBar}>
+            <BottomNav/>
+          </View>
+        </ImageBackground>
+      </ThemeProvider>
+    )
+  }
+}
+
+class ItemsHome extends Component {
+  render() {
+    return (
+      <ThemeProvider uiTheme={uiTheme}>
+        <View style={{flex: 1}}>
+          <View style={styles.contentContainer}>
+            <Text>Items</Text>
+          </View>
+          <View style={styles.navBar}>
+            <BottomNav/>
+          </View>
+        </View>
+      </ThemeProvider>
+    )
+  }
+}
+
+class SummonerRank extends Component {
+  render() {
+    var rank_image = require("./assets/images/badges/UNRANKED.png")
+    if (this.props.rank.indexOf("BRONZE") !== -1) { rank_image = require("./assets/images/badges/BRONZE.png") }
+    if (this.props.rank.indexOf("SILVER") !== -1) { rank_image = require("./assets/images/badges/SILVER.png") }
+    if (this.props.rank.indexOf("GOLD") !== -1) { rank_image = require("./assets/images/badges/GOLD.png") }
+    if (this.props.rank.indexOf("PLATINUM") !== -1) { rank_image = require("./assets/images/badges/PLATINUM.png") }
+    if (this.props.rank.indexOf("DIAMOND") !== -1) { rank_image = require("./assets/images/badges/DIAMOND.png") }
+    if (this.props.rank.indexOf("MASTER") !== -1) { rank_image = require("./assets/images/badges/MASTER.png") }
+    if (this.props.rank.indexOf("CHALLENGER") !== -1) { rank_image = require("./assets/images/badges/CHALLENGER.png") }
+
+    return (
+      <View style={{alignItems: 'center', flex:0.333333, paddingTop: 8, paddingBottom: 8}}>
+        <Text style={{fontWeight: '700', backgroundColor: 'transparent', fontFamily: 'Marker Felt'}}>{this.props.queue}</Text>
+        <Image source={rank_image} style={{width: 70, height: 63}}/>
+        <Text style={{fontWeight: '700', backgroundColor: 'transparent', fontFamily: 'Marker Felt'}}>{this.props.rank}</Text>
+      </View>
+    )
+  }
+}
+
+class BottomNav extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  _clickItems() {
+    this.props.navigator.push({title: "Items", component: ItemsHome})
   }
 
   render() {
@@ -98,7 +266,7 @@ class BottomNav extends React.Component {
           key="items"
           icon="pages"
           label="Items"
-          onPress={() => this.setState({ active: 'items' })}
+          onPress={this._clickItems}
         />
         <BottomNavigation.Action
           key="profile"
@@ -111,16 +279,14 @@ class BottomNav extends React.Component {
   }  
 }
 
-const App = StackNavigator({
-  Home: { screen: HomeScreen },
-});
-
-AppRegistry.registerComponent('SimpleApp', () => SimpleApp);
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ddd',
+    width: null,
+    height: null
+  },
+  itemListContainer: {
+    paddingTop: 75
   },
   contentContainer: {
     flex: 1,
@@ -135,5 +301,41 @@ const styles = StyleSheet.create({
     width: 200,
     height: 120,
     resizeMode: 'contain'
+  },
+  champListContainer: {
+    marginTop: -60,
+    flex: 1
+  },
+  itemIcon: {
+    height: 28,
+    width: 28,
+    borderColor: "#cc9f3f",
+    borderWidth: 1,
+    backgroundColor: "#666"
+  },
+  itemContainer: {
+    flexDirection: 'row', 
+    padding: 4,
+    borderBottomColor: '#888',
+    borderBottomWidth: 0.5,
   }
 });
+
+const itemListStyles = StyleSheet.create({
+  kda: {
+    paddingTop: 4,
+    fontSize: 16,
+    paddingLeft: 5,
+    fontWeight: '700'
+  },
+  gameMode: {
+    fontSize: 12, 
+    fontWeight: "900", 
+    color: '#777', 
+    paddingLeft: 5
+  }
+});
+
+resultBGColor = function(item) {
+  return 'blue'
+}
