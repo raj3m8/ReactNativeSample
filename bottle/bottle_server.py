@@ -2,9 +2,9 @@ import bottle
 import requests
 import json
 from bottle import route, hook, run, template, response, get
-from constants import champion_map
+from constants import champion_map, summoner_spells_map
 
-api_key = "RGAPI-c6fb2f0e-ac91-4a3c-b2de-cd21596e2cc6"
+api_key = "RGAPI-a465f6d0-3cb2-4dde-861c-08b65eda0575"
 
 class EnableCors(object):
   def apply(self, fn, context):
@@ -39,7 +39,7 @@ def index(summoner):
   champ_masteries = [dict(item, **{'champion': getChampionNameById(item['championId'])}) for item in champ_masteries][:5]
   match_data = []
 
-  for item in match_list_data[:5]:
+  for item in match_list_data[:2]:
     match = requests.get("https://na1.api.riotgames.com/lol/match/v3/matches/"+str(item['gameId'])+"?forAccountId="+str(summoner_data['accountId'])+"&api_key="+api_key)
     match = json.loads(match.text)
 
@@ -54,6 +54,19 @@ def index(summoner):
     match['champion'] = getChampionNameById(championId)
     match['win'] = next((x for x in match['teams'] if x['teamId'] == teamId), None)['win']
     match['stats'] = next((x for x in match['participants'] if x['participantId'] == participantId), None)['stats']
+    match['summoner_spells'] = findSummonerSpells(participant)
+
+    for item in match['participants']:
+      item.update( {"champion": getChampionNameById(item['championId'])})
+
+    for team in match['teams']:
+      team['kills'] = team['deaths'] = team['assists'] = 0
+      for p in match['participants']:
+        if p['teamId'] == team['teamId']:
+          team['kills'] += p['stats']['kills']
+          team['deaths'] += p['stats']['deaths']
+          team['assists'] += p['stats']['assists']
+
     match_data.append(match)
 
   return {
@@ -79,6 +92,12 @@ def summonerRanks(summonerId,summonerName):
 def championMastery(summonerId):
   champ_mast_data = requests.get("https://na1.api.riotgames.com/lol/champion-mastery/v3/champion-masteries/by-summoner/"+summonerId+"?api_key="+api_key)
   return json.loads(champ_mast_data.text)
+
+def findSummonerSpells(participant):
+  summoner_spells = []
+  summoner_spells.append(next((x for x in summoner_spells_map if x['id'] == participant['spell1Id']), None)['key'])
+  summoner_spells.append(next((x for x in summoner_spells_map if x['id'] == participant['spell2Id']), None)['key'])
+  return summoner_spells
 
 app.install(EnableCors())
 app.run(port=8080)
