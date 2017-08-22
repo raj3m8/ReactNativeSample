@@ -39,7 +39,7 @@ def index(summoner):
   champ_masteries = [dict(item, **{'champion': getChampionNameById(item['championId'])}) for item in champ_masteries][:5]
   match_data = []
 
-  for item in match_list_data[:3]:
+  for item in match_list_data[:5]:
     match = requests.get("https://na1.api.riotgames.com/lol/match/v3/matches/"+str(item['gameId'])+"?forAccountId="+str(summoner_data['accountId'])+"&api_key="+api_key)
     match = json.loads(match.text)
 
@@ -56,7 +56,11 @@ def index(summoner):
     match['stats'] = next((x for x in match['participants'] if x['participantId'] == participantId), None)['stats']
     match_data.append(match)
 
-  return {'match_data': match_data, 'summoner_ranks': summoner_ranks, 'champ_masteries': champ_masteries} 
+  return {
+    'match_data': match_data, 
+    'summoner_ranks': summoner_ranks, 
+    'champ_masteries': champ_masteries
+  } 
 
 def getParticipantId(match):
   return next((x for x in match['participantIdentities'] if 'player' in x), None)['participantId']
@@ -69,34 +73,12 @@ def getChampionNameById(championId):
   return champion
 
 def summonerRanks(summonerId,summonerName):
-  summoner_rank_data = requests.get("https://na1.api.riotgames.com/lol/league/v3/leagues/by-summoner/"+summonerId+"?api_key="+api_key)
-  summoner_rank_base_data = json.loads(summoner_rank_data.text)
-  ranks = {}
-
-  summoner_rank_data = next((x for x in summoner_rank_base_data if x['queue'] == "RANKED_SOLO_5x5"), None)
-  if (summoner_rank_data):
-    ranks['Solo/Duo'] = summoner_rank_data['tier'] + " " + next((x for x in summoner_rank_data['entries'] if x['playerOrTeamName'] == summonerName), None)['rank']
-  else:
-    ranks['Solo/Duo'] = 'UNRANKED'
-
-  summoner_rank_data = next((x for x in summoner_rank_base_data if x['queue'] == "RANKED_FLEX_SR"), None)
-  if (summoner_rank_data):
-    ranks['Flex5v5'] = summoner_rank_data['tier'] + " " + next((x for x in summoner_rank_data['entries'] if x['playerOrTeamName'] == summonerName), None)['rank']
-  else:
-    ranks['Flex5v5'] = 'UNRANKED'
-
-  summoner_rank_data = next((x for x in summoner_rank_base_data if x['queue'] == "RANKED_FLEX_TT"), None)
-  if (summoner_rank_data):
-    ranks['Flex3v3'] = summoner_rank_data['tier'] + " " + next((x for x in summoner_rank_data['entries'] if x['playerOrTeamName'] == summonerName), None)['rank']
-  else:
-    ranks['Flex3v3'] = 'UNRANKED'
-
-  return ranks
+  summoner_rank_data = requests.get("https://na1.api.riotgames.com/lol/league/v3/positions/by-summoner/"+summonerId+"?api_key="+api_key)
+  return json.loads(summoner_rank_data.text)
 
 def championMastery(summonerId):
   champ_mast_data = requests.get("https://na1.api.riotgames.com/lol/champion-mastery/v3/champion-masteries/by-summoner/"+summonerId+"?api_key="+api_key)
-  champ_mast_data = json.loads(champ_mast_data.text)
-  return champ_mast_data
+  return json.loads(champ_mast_data.text)
 
 app.install(EnableCors())
 app.run(port=8080)

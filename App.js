@@ -1,9 +1,12 @@
 import React, { Component, PropTypes } from 'react';
-import { StyleSheet, Text, View, Image, AppRegistry, NavigatorIOS, FlatList, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, Image, AppRegistry, NavigatorIOS, FlatList, ImageBackground, Alert, TouchableHighlight, ActivityIndicator, ScrollView } from 'react-native';
 import { BottomNavigation, COLOR, ThemeProvider, Button } from 'react-native-material-ui';
 import { StackNavigator } from 'react-navigation';
 import { setCustomText } from 'react-native-global-props';
 import { Font } from 'expo';
+
+var numeral = require('numeral');
+var moment = require('moment');
 
 const customTextProps = {
   style: {
@@ -33,6 +36,10 @@ function championNameFormat(champion) {
   return formatChampName.charAt(0).toUpperCase() + formatChampName.slice(1);
 }
 
+function findRankByName(ranks,name) {
+  var rank = ranks.find(x => x.queueType === name)
+  return rank ? rank : {'tier': 'UNRANKED', 'wins': 0, 'losses': 0};
+}
 
 export default class App extends Component {
   render() {
@@ -51,7 +58,7 @@ export default class App extends Component {
 class HomeScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {animating: false};
     this.handleChange = this.handleChange.bind(this);
     this._onSearch = this._onSearch.bind(this);
   }
@@ -62,22 +69,23 @@ class HomeScreen extends Component {
 
   _onSearch() {
     const parent = this;
+    this.setState({ animating: true })
     fetch('http://localhost:8080/api/summoner/'+this.state.summoner_name, {
       method: 'GET'
     })
     .then((response) => response.json())
     .then((responseJson) => {
-      console.log(responseJson);
-
-      this.props.navigator.push({
+      parent.props.navigator.push({
         title: parent.state.summoner_name,
         component: SummonerSearchResults,
         passProps: {
           match_data: responseJson.match_data, 
           summoner_ranks: responseJson.summoner_ranks,
-          champ_masteries: responseJson.champ_masteries
+          champ_masteries: responseJson.champ_masteries,
+          navigator: parent.props.navigator
         }
       });
+      this.setState({ animating: false })
     })
   }
 
@@ -93,9 +101,7 @@ class HomeScreen extends Component {
             <Image source={require("./assets/images/lol_logo.png")} style={styles.homeLogo} />
             <MKTextField onChangeText={ this.handleChange } style={styles.summonerSearchField} textInputStyle={{color: '#ddd'}} placeholder="Summoner Name..." />
             <Button raised primary text="Search" onPress={this._onSearch} />
-          </View>
-          <View style={styles.navBar}>
-            <BottomNav/>
+            <ActivityIndicator animating={this.state.animating} color='#555' size="large"/>
           </View>
         </ImageBackground>
       </ThemeProvider>
@@ -119,43 +125,68 @@ class ChampionMasteries extends Component {
         <Image style={{height: 60, width: 60, borderRadius: 30, borderWidth: 3, borderColor: '#cab546'}} source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.10.1/img/champion/'+championNameFormat(this.props.champion['champion'])+'.png'}} />
         <Image source={champ_rank_image} style={{width: 60, height: 60, marginTop: -22}}/>
         <Text style={{fontWeight: "700"}}>Level {this.props.champion['championLevel']}</Text>
-        <Text style={{fontWeight: "700"}}>{this.props.champion['championPoints']}</Text>
+        <Text style={{fontWeight: "700"}}>{numeral(this.props.champion['championPoints']).format('0,0')}</Text>
       </View>
     )
   }
 }
 
+class MatchScreen extends Component {
+  render() {
+    return (
+      <ImageBackground style={styles.container} source={require("./assets/images/bg.jpg")}>
+
+      </ImageBackground>
+    )
+  }
+}
+
 class MatchListItems extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+    this._onMatchClick = this._onMatchClick.bind(this);
+  }
+
+  _onMatchClick() {
+    this.props.navigator.push({
+      title: "Match",
+      component: MatchScreen
+    });
+  }
+
   _renderItem = ({item}) => (
-    <View style={[styles.itemContainer,{backgroundColor: item['win'] == 'Win' ? '#7edab5' : '#f5aab2'}]}>
-      <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.10.1/img/champion/'+championNameFormat(item['champion'])+'.png'}} style={{width: 70, height: 70}} />
-      <View style={{flexDirection: 'column', alignSelf: 'stretch', flex: 1}}>
-        <View style={{flexDirection: 'row'}}>
-          <View style={{flexDirection: 'column', flex: 0.34}}>
-            <Text style={itemListStyles.kda}>{item['kda']['kills']} / {item['kda']['deaths']} / {item['kda']['assists']}</Text>
-            <Text style={itemListStyles.gameMode}>{item['gameMode']}</Text>
-            <Text style={itemListStyles.gameMode}>{item['gameDuration']}</Text>
-          </View>
-          <View style={{flexDirection: 'column', flex: 1}}>
-            <View style={{justifyContent: 'flex-end', flexDirection: 'row', flex: 1}}>
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item0']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item1']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item2']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item3']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item4']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item5']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item6']+'.png'}} style={styles.itemIcon} />
+    <TouchableHighlight onPress={this._onMatchClick}>
+      <View style={[styles.itemContainer,{backgroundColor: item['win'] == 'Win' ? '#7edab5' : '#f5aab2'}]} >
+        <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.10.1/img/champion/'+championNameFormat(item['champion'])+'.png'}} style={{width: 70, height: 70}} />
+        <View style={{flexDirection: 'column', alignSelf: 'stretch', flex: 1}}>
+          <View style={{flexDirection: 'row'}}>
+            <View style={{flexDirection: 'column', flex: 0.40}}>
+              <Text style={itemListStyles.kda}>{item['kda']['kills']} / {item['kda']['deaths']} / {item['kda']['assists']}</Text>
+              <Text style={itemListStyles.gameMode}>{item['gameMode']}</Text>
+              <Text style={itemListStyles.gameMode}>{moment("2015-01-01").startOf('day').seconds(item['gameDuration']).format('mm:ss')}</Text>
             </View>
-            <View style={{flexDirection: 'row', paddingLeft: 70, marginTop: 4}}>
-              <Text style={{fontWeight: "700"}}>{item['stats']['totalMinionsKilled']+item['stats']['neutralMinionsKilled']}</Text>
-              <Image source={require("./assets/images/cs.png")} style={{marginTop: 2, marginLeft: 3}}/>
-              <Text style={{marginLeft: 20, fontWeight: "700"}}>{item['stats']['goldEarned']}</Text>
-              <Image source={require("./assets/images/coin.png")} style={{marginTop: 2, marginLeft: 3}}/>
+            <View style={{flexDirection: 'column', flex: 1}}>
+              <View style={{justifyContent: 'flex-end', flexDirection: 'row', flex: 1}}  onPress={this._onMatchClick}>
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item0']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item1']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item2']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item3']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item4']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item5']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.10.1/img/item/'+item['stats']['item6']+'.png'}} style={styles.itemIcon} />
+              </View>
+              <View style={{flexDirection: 'row', paddingLeft: 70, marginTop: 4}}>
+                <Text style={{fontWeight: "700"}}>{item['stats']['totalMinionsKilled']+item['stats']['neutralMinionsKilled']}</Text>
+                <Image source={require("./assets/images/cs.png")} style={{marginTop: 2, marginLeft: 3}}/>
+                <Text style={{marginLeft: 20, fontWeight: "700"}}>{numeral(item['stats']['goldEarned']).format('0,0')}</Text>
+                <Image source={require("./assets/images/coin.png")} style={{marginTop: 2, marginLeft: 3}}/>
+              </View>
             </View>
           </View>
         </View>
       </View>
-    </View>
+    </TouchableHighlight>
   );
 
   _keyExtractor = (item, index) => item['gameId'];
@@ -181,42 +212,24 @@ class SummonerSearchResults extends Component {
     return (
       <ThemeProvider uiTheme={uiTheme}>
         <ImageBackground style={[styles.container,styles.itemListContainer]} source={require("./assets/images/bg.jpg")}>
-          <View style={{flexDirection: 'row', marginLeft: 5, marginRight: 5, backgroundColor: 'rgba(52, 52, 52, 0.2)'}}>
-            <SummonerRank rank={this.props.summoner_ranks['Solo/Duo']} queue='Solo/Duo' />
-            <SummonerRank rank={this.props.summoner_ranks['Flex5v5']} queue='Flex5v5' />
-            <SummonerRank rank={this.props.summoner_ranks['Flex3v3']} queue='Flex3v3' />
-          </View>
-          <View style={{flexDirection: 'row', margin: 5, backgroundColor: 'rgba(52, 52, 52, 0.2)'}}>
-            {this.props.champ_masteries.length > 0 && <ChampionMasteries champion={this.props.champ_masteries[0]} /> }
-            {this.props.champ_masteries.length > 1 && <ChampionMasteries champion={this.props.champ_masteries[1]} /> }
-            {this.props.champ_masteries.length > 2 && <ChampionMasteries champion={this.props.champ_masteries[2]} /> }
-            {this.props.champ_masteries.length > 3 && <ChampionMasteries champion={this.props.champ_masteries[3]} /> }
-            {this.props.champ_masteries.length > 4 && <ChampionMasteries champion={this.props.champ_masteries[4]} /> }
-          </View>
-          <View style={styles.champListContainer}>
-            <MatchListItems match_data={this.props.match_data}/>
-          </View>
-          <View style={styles.navBar}>
-            <BottomNav/>
-          </View>
+          <ScrollView>
+            <View style={{flexDirection: 'row', marginTop: -70, marginLeft: 5, marginRight: 5, backgroundColor: 'rgba(52, 52, 52, 0.2)'}}>
+              <SummonerRank rank={findRankByName(this.props.summoner_ranks, 'RANKED_SOLO_5x5')} queue='Solo/Duo' />
+              <SummonerRank rank={findRankByName(this.props.summoner_ranks, 'RANKED_FLEX_SR')} queue='Flex5v5' />
+              <SummonerRank rank={findRankByName(this.props.summoner_ranks, 'RANKED_FLEX_TT')} queue='Flex3v3' />
+            </View>
+            <View style={{flexDirection: 'row', margin: 5, marginBottom: 65, backgroundColor: 'rgba(52, 52, 52, 0.2)'}}>
+              {this.props.champ_masteries.length > 0 && <ChampionMasteries champion={this.props.champ_masteries[0]} /> }
+              {this.props.champ_masteries.length > 1 && <ChampionMasteries champion={this.props.champ_masteries[1]} /> }
+              {this.props.champ_masteries.length > 2 && <ChampionMasteries champion={this.props.champ_masteries[2]} /> }
+              {this.props.champ_masteries.length > 3 && <ChampionMasteries champion={this.props.champ_masteries[3]} /> }
+              {this.props.champ_masteries.length > 4 && <ChampionMasteries champion={this.props.champ_masteries[4]} /> }
+            </View>
+            <View style={styles.champListContainer}>
+              <MatchListItems match_data={this.props.match_data} navigator={this.props.navigator}/>
+            </View>
+          </ScrollView>
         </ImageBackground>
-      </ThemeProvider>
-    )
-  }
-}
-
-class ItemsHome extends Component {
-  render() {
-    return (
-      <ThemeProvider uiTheme={uiTheme}>
-        <View style={{flex: 1}}>
-          <View style={styles.contentContainer}>
-            <Text>Items</Text>
-          </View>
-          <View style={styles.navBar}>
-            <BottomNav/>
-          </View>
-        </View>
       </ThemeProvider>
     )
   }
@@ -225,19 +238,23 @@ class ItemsHome extends Component {
 class SummonerRank extends Component {
   render() {
     var rank_image = require("./assets/images/badges/UNRANKED.png")
-    if (this.props.rank.indexOf("BRONZE") !== -1) { rank_image = require("./assets/images/badges/BRONZE.png") }
-    if (this.props.rank.indexOf("SILVER") !== -1) { rank_image = require("./assets/images/badges/SILVER.png") }
-    if (this.props.rank.indexOf("GOLD") !== -1) { rank_image = require("./assets/images/badges/GOLD.png") }
-    if (this.props.rank.indexOf("PLATINUM") !== -1) { rank_image = require("./assets/images/badges/PLATINUM.png") }
-    if (this.props.rank.indexOf("DIAMOND") !== -1) { rank_image = require("./assets/images/badges/DIAMOND.png") }
-    if (this.props.rank.indexOf("MASTER") !== -1) { rank_image = require("./assets/images/badges/MASTER.png") }
-    if (this.props.rank.indexOf("CHALLENGER") !== -1) { rank_image = require("./assets/images/badges/CHALLENGER.png") }
+    if (this.props && this.props.rank) {
+      console.log(this.props.rank)
+      if (this.props.rank['tier'].indexOf("BRONZE") !== -1) { rank_image = require("./assets/images/badges/BRONZE.png") }
+      if (this.props.rank['tier'].indexOf("SILVER") !== -1) { rank_image = require("./assets/images/badges/SILVER.png") }
+      if (this.props.rank['tier'].indexOf("GOLD") !== -1) { rank_image = require("./assets/images/badges/GOLD.png") }
+      if (this.props.rank['tier'].indexOf("PLATINUM") !== -1) { rank_image = require("./assets/images/badges/PLATINUM.png") }
+      if (this.props.rank['tier'].indexOf("DIAMOND") !== -1) { rank_image = require("./assets/images/badges/DIAMOND.png") }
+      if (this.props.rank['tier'].indexOf("MASTER") !== -1) { rank_image = require("./assets/images/badges/MASTER.png") }
+      if (this.props.rank['tier'].indexOf("CHALLENGER") !== -1) { rank_image = require("./assets/images/badges/CHALLENGER.png") }
+    }
 
     return (
       <View style={{alignItems: 'center', flex:0.333333, paddingTop: 8, paddingBottom: 8}}>
-        <Text style={{fontWeight: '700', backgroundColor: 'transparent', fontFamily: 'Marker Felt'}}>{this.props.queue}</Text>
+        <Text style={styles.summonerRankText}>{this.props.queue}</Text>
         <Image source={rank_image} style={{width: 70, height: 63}}/>
-        <Text style={{fontWeight: '700', backgroundColor: 'transparent', fontFamily: 'Marker Felt'}}>{this.props.rank}</Text>
+        <Text style={styles.summonerRankText}>{this.props.rank['wins']} - {this.props.rank['losses']}</Text>
+        <Text style={styles.summonerRankText}>{this.props.rank['tier']} {this.props.rank['rank']}</Text>
       </View>
     )
   }
@@ -318,6 +335,11 @@ const styles = StyleSheet.create({
     padding: 4,
     borderBottomColor: '#888',
     borderBottomWidth: 0.5,
+  },
+  summonerRankText: {
+    fontWeight: '700', 
+    backgroundColor: 'transparent', 
+    fontFamily: 'Marker Felt'
   }
 });
 
@@ -335,7 +357,3 @@ const itemListStyles = StyleSheet.create({
     paddingLeft: 5
   }
 });
-
-resultBGColor = function(item) {
-  return 'blue'
-}
