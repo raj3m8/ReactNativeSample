@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { ThemeProvider } from 'react-native-material-ui';
 import { StyleSheet, View, Text, Image, ImageBackground, Alert, ActivityIndicator, ScrollView, FlatList, TouchableHighlight } from 'react-native';
-import { uiTheme, championNameFormat } from './../App.js'
+import { uiTheme, numeral, moment } from './../App.js'
 import { MatchScreen } from './match.js'
 
-var numeral = require('numeral');
-var moment = require('moment');
+
 
 function findRankByName(ranks,name) {
   var rank = ranks.find(x => x.queueType === name)
@@ -82,11 +81,10 @@ class ChampionMasteries extends Component {
 
     return (
       <View style={{flexDirection: 'column', paddingTop: 8, paddingBottom: 8, flex:0.18, paddingLeft: 8, alignItems: 'center'}}>
-      <Text>{championNameFormat(this.props.champion['champion'])}</Text>
-        <Image style={{height: 60, width: 60, borderRadius: 30, borderWidth: 3, borderColor: '#cab546'}} source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.16.1/img/champion/'+championNameFormat(this.props.champion['champion'])+'.png'}} />
+        <Image style={{height: 60, width: 60, borderRadius: 30, borderWidth: 3, borderColor: '#cab546'}} source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.16.1/img/champion/'+this.props.champion['champion']+'.png'}} />
         <Image source={champ_rank_image} style={{width: 60, height: 60, marginTop: -22}}/>
-        <Text style={{fontWeight: "700"}}>Level {this.props.champion['championLevel']}</Text>
-        <Text style={{fontWeight: "700"}}>{numeral(this.props.champion['championPoints']).format('0,0')}</Text>
+        <Text style={{fontWeight: '700'}}>Level {this.props.champion['championLevel']}</Text>
+        <Text style={{fontWeight: '700'}}>{numeral(this.props.champion['championPoints']).format('0,0')}</Text>
       </View>
     )
   }
@@ -101,7 +99,7 @@ class MatchListItems extends Component {
 
   _onMatchClick(item) {
     this.props.navigator.push({
-      title: "Match",
+      title: "Match (" + moment("2015-01-01").startOf('day').seconds(item['gameDuration']).format('mm:ss') + ")",
       component: MatchScreen,
       passProps: {
       	match_data: item
@@ -113,7 +111,7 @@ class MatchListItems extends Component {
     <TouchableHighlight onPress={()=>this._onMatchClick(item)}>
       <View style={[styles.itemContainer,{backgroundColor: item['win'] == 'Win' ? '#7edab5' : '#f5aab2'}]} >
         <View style={{flexDirection: 'column'}}>
-          <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.16.1/img/champion/'+championNameFormat(item['champion'])+'.png'}} style={{width: 70, height: 70}} />
+          <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.16.1/img/champion/'+item['champion']+'.png'}} style={{width: 70, height: 70}} />
           <Text style={itemListStyles.champLevel}>{item['stats']['champLevel']}</Text>
         </View>
         <View style={{flexDirection: 'column', alignSelf: 'stretch', flex: 1}}>

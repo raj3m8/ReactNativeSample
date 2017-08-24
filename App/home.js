@@ -20,7 +20,7 @@ export class HomeScreen extends Component {
   _onSearch() {
     const parent = this;
     this.setState({ animating: true })
-    fetch('http://localhost:8080/api/summoner/'+this.state.summoner_name, {
+    fetch('http://localhost:3000/summoner/'+this.state.summoner_name, {
       method: 'GET'
     })
     .then((response) => response.json())
@@ -48,7 +48,7 @@ export class HomeScreen extends Component {
       <ThemeProvider uiTheme={uiTheme}>
         <ImageBackground style={styles.container} source={require("./../assets/images/bg.jpg")}>
           <View style={styles.contentContainer}>
-            <Image source={require("./../assets/images/lol_logo.png")} style={styles.homeLogo} />
+            <Image source={require("./../assets/images/logo.png")} style={styles.homeLogo} />
             <MKTextField onChangeText={ this.handleChange } style={styles.summonerSearchField} textInputStyle={{color: '#ddd'}} placeholder="Summoner Name..." />
             <Button raised primary text="Search" onPress={this._onSearch} />
             <ActivityIndicator animating={this.state.animating} color='#555' size="large"/>
@@ -66,9 +66,9 @@ const styles = StyleSheet.create({
     height: null
   },
   contentContainer: {
-    flex: 1,
     alignItems: 'center',
-    marginTop: 100
+    marginTop: 100,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
   },
   summonerSearchField: {
     marginBottom: 8,

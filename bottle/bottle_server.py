@@ -4,7 +4,7 @@ import json
 from bottle import route, hook, run, template, response, get
 from constants import champion_map, summoner_spells_map
 
-api_key = "RGAPI-a465f6d0-3cb2-4dde-861c-08b65eda0575"
+api_key = "RGAPI-e736b86e-d13a-49df-89b2-96cc32bf096d"
 
 class EnableCors(object):
   def apply(self, fn, context):
@@ -62,6 +62,9 @@ def index(summoner):
     for team in match['teams']:
       team['kills'] = team['deaths'] = team['assists'] = 0
       for p in match['participants']:
+        p['summoner_spells'] = findSummonerSpells(p)
+        p['identity'] = next((x for x in match['participantIdentities'] if x['participantId'] == p['participantId']), None)
+        if 'player' not in p['identity']: p['identity'] = {'player': {}} 
         if p['teamId'] == team['teamId']:
           team['kills'] += p['stats']['kills']
           team['deaths'] += p['stats']['deaths']
@@ -81,7 +84,7 @@ def getParticipantId(match):
 def getChampionNameById(championId):
   for key,val in champion_map.items():
     if val['id'] == championId:
-      champion = val['name']
+      champion = val['key']
       break
   return champion
 

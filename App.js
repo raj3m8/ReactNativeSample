@@ -6,13 +6,11 @@ import { setCustomText } from 'react-native-global-props';
 import { Font } from 'expo';
 import { HomeScreen } from './App/home.js'
 
+export const numeral = require('numeral');
+export  const moment = require('moment');
+
 const customTextProps = {style: {fontFamily: 'Arial'} }
 setCustomText(customTextProps);
-
-export function championNameFormat(champion) {
-  var formatChampName = champion.toLowerCase().replace(/'/g,"").replace(/\s(.)/g, function($1) { return $1.toUpperCase(); }).replace(/\s/g, '')
-  return formatChampName.charAt(0).toUpperCase() + formatChampName.slice(1);
-}
 
 export const uiTheme = {
   palette: {
