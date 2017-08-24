@@ -81,7 +81,7 @@ class ChampionMasteries extends Component {
 
     return (
       <View style={{flexDirection: 'column', paddingTop: 8, paddingBottom: 8, flex:0.18, paddingLeft: 8, alignItems: 'center'}}>
-        <Image style={{height: 60, width: 60, borderRadius: 30, borderWidth: 3, borderColor: '#cab546'}} source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.16.1/img/champion/'+this.props.champion['champion']+'.png'}} />
+        <Image style={{height: 60, width: 60, borderRadius: 30, borderWidth: 3, borderColor: '#cab546'}} source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.17.1/img/champion/'+this.props.champion['champion']+'.png'}} />
         <Image source={champ_rank_image} style={{width: 60, height: 60, marginTop: -22}}/>
         <Text style={{fontWeight: '700'}}>Level {this.props.champion['championLevel']}</Text>
         <Text style={{fontWeight: '700'}}>{numeral(this.props.champion['championPoints']).format('0,0')}</Text>
@@ -111,7 +111,7 @@ class MatchListItems extends Component {
     <TouchableHighlight onPress={()=>this._onMatchClick(item)}>
       <View style={[styles.itemContainer,{backgroundColor: item['win'] == 'Win' ? '#7edab5' : '#f5aab2'}]} >
         <View style={{flexDirection: 'column'}}>
-          <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.16.1/img/champion/'+item['champion']+'.png'}} style={{width: 70, height: 70}} />
+          <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.17.1/img/champion/'+item['champion']+'.png'}} style={{width: 70, height: 70}} />
           <Text style={itemListStyles.champLevel}>{item['stats']['champLevel']}</Text>
         </View>
         <View style={{flexDirection: 'column', alignSelf: 'stretch', flex: 1}}>
@@ -121,19 +121,19 @@ class MatchListItems extends Component {
               <Text style={itemListStyles.gameMode}>{item['gameMode']}</Text>
               <Text style={itemListStyles.gameMode}>{moment("2015-01-01").startOf('day').seconds(item['gameDuration']).format('mm:ss')}</Text>
               <View style={{flexDirection: 'row'}}>
-                <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.16.1/img/spell/'+item['summoner_spells'][0]+'.png'}} style={{height: 22, width: 22, marginLeft: 4}}/>
-                <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.16.1/img/spell/'+item['summoner_spells'][1]+'.png'}} style={{height: 22, width: 22, marginLeft: 2}}/>
+                <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.17.1/img/spell/'+item['summoner_spells'][0]+'.png'}} style={{height: 22, width: 22, marginLeft: 4}}/>
+                <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.17.1/img/spell/'+item['summoner_spells'][1]+'.png'}} style={{height: 22, width: 22, marginLeft: 2}}/>
               </View>
             </View>
             <View style={{flexDirection: 'column', flex: 1}}>
               <View style={{justifyContent: 'flex-end', flexDirection: 'row', flex: 1}}>
-                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+item['stats']['item0']+'.png'}} style={styles.itemIcon} />
-                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+item['stats']['item1']+'.png'}} style={styles.itemIcon} />
-                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+item['stats']['item2']+'.png'}} style={styles.itemIcon} />
-                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+item['stats']['item3']+'.png'}} style={styles.itemIcon} />
-                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+item['stats']['item4']+'.png'}} style={styles.itemIcon} />
-                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+item['stats']['item5']+'.png'}} style={styles.itemIcon} />
-                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+item['stats']['item6']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+item['stats']['item0']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+item['stats']['item1']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+item['stats']['item2']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+item['stats']['item3']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+item['stats']['item4']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+item['stats']['item5']+'.png'}} style={styles.itemIcon} />
+                <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+item['stats']['item6']+'.png'}} style={styles.itemIcon} />
               </View>
               <View style={{flexDirection: 'row', paddingLeft: 70, marginTop: -10}}>
                 <Text style={{fontWeight: "700"}}>{item['stats']['totalMinionsKilled']+item['stats']['neutralMinionsKilled']}</Text>

@@ -73,10 +73,10 @@ class ChampionLineItem extends Component {
     const rankColor = findRankColor(player['highestAchievedSeasonTier']);
     return (
       <View style={{marginTop: 2, flexDirection: 'row'}}>
-        <Image style={{width: 44, height: 44, borderWidth: 1, borderColor: "#ccc"}} source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.16.1/img/champion/'+player['champion']+'.png'}} />
+        <Image style={{width: 44, height: 44, borderWidth: 1, borderColor: "#ccc"}} source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.17.1/img/champion/'+player['champion']+'.png'}} />
         <View style={{flexDirection: 'column'}}>
-          <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.16.1/img/spell/'+player['summoner_spells'][0]+'.png'}} style={styles.summonerSpells} />
-          <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.16.1/img/spell/'+player['summoner_spells'][1]+'.png'}} style={styles.summonerSpells} />
+          <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.17.1/img/spell/'+player['summoner_spells'][0]+'.png'}} style={styles.summonerSpells} />
+          <Image source={{uri: 'https://ddragon.leagueoflegends.com/cdn/7.17.1/img/spell/'+player['summoner_spells'][1]+'.png'}} style={styles.summonerSpells} />
         </View>
         <View style={{flexDirection: 'column', flex: 1}}>
           <View style={{flexDirection: 'row'}}>
@@ -85,13 +85,13 @@ class ChampionLineItem extends Component {
               <Text style={styles.rankLabel}>{player['highestAchievedSeasonTier']}</Text> 
             </View>
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+player['stats']['item0']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+player['stats']['item1']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+player['stats']['item2']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+player['stats']['item3']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+player['stats']['item4']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+player['stats']['item5']+'.png'}} style={styles.itemIcon} />
-              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.16.1/img/item/'+player['stats']['item6']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+player['stats']['item0']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+player['stats']['item1']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+player['stats']['item2']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+player['stats']['item3']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+player['stats']['item4']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+player['stats']['item5']+'.png'}} style={styles.itemIcon} />
+              <Image source={{uri: 'http://ddragon.leagueoflegends.com/cdn/7.17.1/img/item/'+player['stats']['item6']+'.png'}} style={styles.itemIcon} />
             </View>
           </View>
           <View style={{flexDirection: 'row', flex: 1}}>
