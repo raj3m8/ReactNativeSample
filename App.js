@@ -1,16 +1,47 @@
 import React, { Component, PropTypes } from 'react';
 import { StyleSheet, Text, View, Image, AppRegistry, NavigatorIOS, FlatList, ImageBackground, Alert, TouchableHighlight, ActivityIndicator, ScrollView } from 'react-native';
 import { BottomNavigation, COLOR, ThemeProvider, Button } from 'react-native-material-ui';
-import { StackNavigator } from 'react-navigation';
+import { TabNavigator } from 'react-navigation';
 import { setCustomText } from 'react-native-global-props';
 import { Font } from 'expo';
+import { applyMiddleware, combineReducers, createStore } from 'redux'
+import logger from 'redux-logger'
+import { Provider } from 'react-redux'
+
 import { HomeScreen } from './App/home.js'
+import { ItemsHome } from './App/items.js'
 
 export const numeral = require('numeral');
-export  const moment = require('moment');
+export const moment = require('moment');
+
+const middleware = () => {
+  return applyMiddleware(logger())
+}
 
 const customTextProps = {style: {fontFamily: 'Arial'} }
 setCustomText(customTextProps);
+export default createStore(
+  combineReducers({
+    tabBar: (state,action) => TabBar.router.getStateForAction(action,state),
+      tabOne: (state,action) => NavigatorHomeTab.router.getStateForAction(action,state),
+      tabTwo: (state,action) => NavigatorItemTab.router.getStateForAction(action,state),
+  }),
+  middleware(),
+)
+
+const routeConfiguration = {
+  HomeNavigation: { screen: HomeScreen },
+  ItemNavigation: { screen: ItemsHome },
+}
+const tabBarConfiguration = {
+  tabBarOptions:{
+    activeTintColor: 'white',
+    inactiveTintColor: 'blue',
+    activeBackgroundColor: 'blue',
+    inactiveBackgroundColor: 'white',
+  }
+}
+export const TabBar = TabNavigator(routeConfiguration,tabBarConfiguration)
 
 export const uiTheme = {
   palette: {
@@ -26,6 +57,16 @@ export const uiTheme = {
 export default class App extends Component {
   render() {
     return (
+      <Provider store={store}>
+        <Navigator />
+      </Provider>
+    );
+  }
+}
+
+export class Navigator extends Component {
+  render() {
+    return (
       <NavigatorIOS
         initialRoute={{
           component: HomeScreen,
@@ -37,14 +78,15 @@ export default class App extends Component {
   }
 }
 
-class BottomNav extends Component {
+export class BottomNav extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this._clickItems = this._clickItems.bind(this);
   }
 
   _clickItems() {
-    this.props.navigator.push({title: "Items", component: ItemsHome})
+    this.setState({ active: 'items' });
   }
 
   render() {
