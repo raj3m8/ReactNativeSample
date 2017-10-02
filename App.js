@@ -5,43 +5,17 @@ import { TabNavigator } from 'react-navigation';
 import { setCustomText } from 'react-native-global-props';
 import { Font } from 'expo';
 import { applyMiddleware, combineReducers, createStore } from 'redux'
-import logger from 'redux-logger'
+import { createLogger } from 'redux-logger'
 import { Provider } from 'react-redux'
+import store from './App/store'
 
-import { HomeScreen } from './App/home.js'
-import { ItemsHome } from './App/items.js'
+import { TabBarNavigation } from './App/tab_bar/views/tab_bar_navigation'
 
 export const numeral = require('numeral');
 export const moment = require('moment');
 
-const middleware = () => {
-  return applyMiddleware(logger())
-}
-
 const customTextProps = {style: {fontFamily: 'Arial'} }
 setCustomText(customTextProps);
-export default createStore(
-  combineReducers({
-    tabBar: (state,action) => TabBar.router.getStateForAction(action,state),
-      tabOne: (state,action) => NavigatorHomeTab.router.getStateForAction(action,state),
-      tabTwo: (state,action) => NavigatorItemTab.router.getStateForAction(action,state),
-  }),
-  middleware(),
-)
-
-const routeConfiguration = {
-  HomeNavigation: { screen: HomeScreen },
-  ItemNavigation: { screen: ItemsHome },
-}
-const tabBarConfiguration = {
-  tabBarOptions:{
-    activeTintColor: 'white',
-    inactiveTintColor: 'blue',
-    activeBackgroundColor: 'blue',
-    inactiveBackgroundColor: 'white',
-  }
-}
-export const TabBar = TabNavigator(routeConfiguration,tabBarConfiguration)
 
 export const uiTheme = {
   palette: {
@@ -58,22 +32,8 @@ export default class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Navigator />
+        <TabBarNavigation />
       </Provider>
-    );
-  }
-}
-
-export class Navigator extends Component {
-  render() {
-    return (
-      <NavigatorIOS
-        initialRoute={{
-          component: HomeScreen,
-          title: 'Home',
-        }}
-        style={{flex: 1}}
-      />
     );
   }
 }

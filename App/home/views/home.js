@@ -2,21 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import { ThemeProvider, Button } from 'react-native-material-ui';
 import { MKTextField } from 'react-native-material-kit'; 
 import { StyleSheet, View, Image, ImageBackground, ActivityIndicator} from 'react-native';
-import { uiTheme, BottomNav } from './../App.js'
-import { ItemsHome } from './items.js'
+import { uiTheme, BottomNav } from '../../../App.js'
 import { SummonerScreen } from './summoner.js'
 import { StackNavigator } from 'react-navigation'
 
-const stackNavigatorConfiguration = {
-  initialRouteName: 'HomeScreen'
-}
-const routeConfiguration = {
-  HomeNavigation: { screen: HomeScreen },
-  ItemNavigation: { screen: ItemsHome },
-}
-export const NavigatorHomeTab = StackNavigator(routeConfiguration,stackNavigatorConfiguration)
-
-export class HomeScreen extends Component {
+export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {animating: false};
@@ -57,10 +47,10 @@ export class HomeScreen extends Component {
   render() {
     return ( 
       <ThemeProvider uiTheme={uiTheme}>
-        <ImageBackground style={styles.container} source={require("./../assets/images/bg.jpg")}>
+        <ImageBackground style={styles.container} source={require("./../../../assets/images/bg.jpg")}>
           <View style={{flex: 1}}>
             <View style={styles.contentContainer}>
-              <Image source={require("./../assets/images/logo.png")} style={styles.homeLogo} />
+              <Image source={require("./../../../assets/images/logo.png")} style={styles.homeLogo} />
               <MKTextField onChangeText={ this.handleChange } style={styles.summonerSearchField} textInputStyle={{color: '#ddd'}} placeholder="Summoner Name..." />
               <Button raised primary text="Search" onPress={this._onSearch} />
               <ActivityIndicator animating={this.state.animating} color='#555' size="large"/>

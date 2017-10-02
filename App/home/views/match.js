@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, Image, ImageBackground, ActivityIndicator, ScrollView, FlatList } from 'react-native';
-import { baseStyles, numeral } from './../App.js'
+import { baseStyles, numeral } from './../../../App.js'
 
 function findRankColor(rank) {
   var color = 'grey'
@@ -18,10 +18,10 @@ function victoryColor(result) {
   return result == "Victory" ? '#537cf3' : '#ec5464';
 }
 
-export class MatchScreen extends Component {
+export default class MatchScreen extends Component {
   render() {
     return (
-      <ImageBackground style={baseStyles.container} source={require("./../assets/images/bg.jpg")}>
+      <ImageBackground style={baseStyles.container} source={require("./../../../assets/images/bg.jpg")}>
         <View style={{backgroundColor: 'transparent', marginTop: 80}}>
           <TeamContainer match_data={this.props.match_data} teamIndex={0} />
           <TeamContainer match_data={this.props.match_data} teamIndex={1} />
@@ -56,11 +56,11 @@ class TeamHeader extends Component {
         <Text style={{fontWeight: '700', fontSize: 18, marginLeft: 6}}>{this.props.teamData['kills']} / {this.props.teamData['deaths']} / {this.props.teamData['assists']}</Text>
         <View style={{flexDirection: 'row', justifyContent: 'flex-end', flex: 1}}>
           <Text>{this.props.teamData['towerKills']}</Text>
-          <Image source={require("./../assets/images/tower.png")} style={styles.teamStatIcons}/>
+          <Image source={require("./../../../assets/images/tower.png")} style={styles.teamStatIcons}/>
           <Text>{this.props.teamData['dragonKills']}</Text>
-          <Image source={require("./../assets/images/dragon.png")} style={styles.teamStatIcons}/>
+          <Image source={require("./../../../assets/images/dragon.png")} style={styles.teamStatIcons}/>
           <Text>{this.props.teamData['baronKills']}</Text>
-          <Image source={require("./../assets/images/baron.png")} style={styles.teamStatIcons}/>
+          <Image source={require("./../../../assets/images/baron.png")} style={styles.teamStatIcons}/>
         </View>
       </View>
     )
@@ -100,9 +100,9 @@ class ChampionLineItem extends Component {
             </View>
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', marginRight: 5 }}>
               <Text style={{fontSize: 14, fontWeight: '700'}}>{player['stats']['totalMinionsKilled']+player['stats']['neutralMinionsKilled']}</Text>
-              <Image source={require("./../assets/images/cs.png")} style={{marginTop: 2, marginLeft: 3, marginRight: 15}}/>
+              <Image source={require("./../../../assets/images/cs.png")} style={{marginTop: 2, marginLeft: 3, marginRight: 15}}/>
               <Text style={{fontSize: 14, fontWeight: '700'}}>{numeral(player['stats']['goldEarned']).format('0,0')}</Text>
-              <Image source={require("./../assets/images/coin.png")} style={{marginTop: 2, marginLeft: 3}}/>
+              <Image source={require("./../../../assets/images/coin.png")} style={{marginTop: 2, marginLeft: 3}}/>
             </View>
           </View>
         </View>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { ThemeProvider } from 'react-native-material-ui';
 import { StyleSheet, View, Text, Image, ImageBackground, Alert, ActivityIndicator, ScrollView, FlatList, TouchableHighlight } from 'react-native';
-import { uiTheme, numeral, moment } from './../App.js'
+import { uiTheme, numeral, moment } from './../../../App.js'
 import { MatchScreen } from './match.js'
 
 
@@ -11,7 +11,7 @@ function findRankByName(ranks,name) {
   return rank ? rank : {'tier': 'UNRANKED', 'wins': 0, 'losses': 0};
 }
 
-export class SummonerScreen extends Component {
+export default class SummonerScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -20,7 +20,7 @@ export class SummonerScreen extends Component {
   render() {
     return (
       <ThemeProvider uiTheme={uiTheme}>
-        <ImageBackground style={[styles.container,styles.itemListContainer]} source={require("./../assets/images/bg.jpg")}>
+        <ImageBackground style={[styles.container,styles.itemListContainer]} source={require("./../../../assets/images/bg.jpg")}>
           <ScrollView>
             <View style={{flexDirection: 'row', marginTop: -70, marginLeft: 5, marginRight: 5, paddingTop: 4, backgroundColor: 'rgba(52, 52, 52, 0.2)'}}>
               <SummonerRank rank={findRankByName(this.props.summoner_ranks, 'RANKED_SOLO_5x5')} queue='Solo/Duo' />
@@ -46,15 +46,15 @@ export class SummonerScreen extends Component {
 
 class SummonerRank extends Component {
   render() {
-    var rank_image = require("./../assets/images/badges/UNRANKED.png")
+    var rank_image = require("./../../../assets/images/badges/UNRANKED.png")
     if (this.props && this.props.rank) {
-      if (this.props.rank['tier'].indexOf("BRONZE") !== -1) { rank_image = require("./../assets/images/badges/BRONZE.png") }
-      if (this.props.rank['tier'].indexOf("SILVER") !== -1) { rank_image = require("./../assets/images/badges/SILVER.png") }
-      if (this.props.rank['tier'].indexOf("GOLD") !== -1) { rank_image = require("./../assets/images/badges/GOLD.png") }
-      if (this.props.rank['tier'].indexOf("PLATINUM") !== -1) { rank_image = require("./../assets/images/badges/PLATINUM.png") }
-      if (this.props.rank['tier'].indexOf("DIAMOND") !== -1) { rank_image = require("./../assets/images/badges/DIAMOND.png") }
-      if (this.props.rank['tier'].indexOf("MASTER") !== -1) { rank_image = require("./../assets/images/badges/MASTER.png") }
-      if (this.props.rank['tier'].indexOf("CHALLENGER") !== -1) { rank_image = require("./../assets/images/badges/CHALLENGER.png") }
+      if (this.props.rank['tier'].indexOf("BRONZE") !== -1) { rank_image = require("./../../../assets/images/badges/BRONZE.png") }
+      if (this.props.rank['tier'].indexOf("SILVER") !== -1) { rank_image = require("./../../../assets/images/badges/SILVER.png") }
+      if (this.props.rank['tier'].indexOf("GOLD") !== -1) { rank_image = require("./../../../assets/images/badges/GOLD.png") }
+      if (this.props.rank['tier'].indexOf("PLATINUM") !== -1) { rank_image = require("./../../../assets/images/badges/PLATINUM.png") }
+      if (this.props.rank['tier'].indexOf("DIAMOND") !== -1) { rank_image = require("./../../../assets/images/badges/DIAMOND.png") }
+      if (this.props.rank['tier'].indexOf("MASTER") !== -1) { rank_image = require("./../../../assets/images/badges/MASTER.png") }
+      if (this.props.rank['tier'].indexOf("CHALLENGER") !== -1) { rank_image = require("./../../../assets/images/badges/CHALLENGER.png") }
     }
 
     return (
@@ -70,14 +70,14 @@ class SummonerRank extends Component {
 
 class ChampionMasteries extends Component {
   render() {
-    var champ_rank_image = require("./../assets/images/champ_mastery/cm1.png")
-    if (this.props.champion['championLevel'] == 1) { champ_rank_image = require("./../assets/images/champ_mastery/cm1.png") }
-    if (this.props.champion['championLevel'] == 2) { champ_rank_image = require("./../assets/images/champ_mastery/cm2.png") }
-    if (this.props.champion['championLevel'] == 3) { champ_rank_image = require("./../assets/images/champ_mastery/cm3.png") }
-    if (this.props.champion['championLevel'] == 4) { champ_rank_image = require("./../assets/images/champ_mastery/cm4.png") }
-    if (this.props.champion['championLevel'] == 5) { champ_rank_image = require("./../assets/images/champ_mastery/cm5.png") }
-    if (this.props.champion['championLevel'] == 6) { champ_rank_image = require("./../assets/images/champ_mastery/cm6.png") }
-    if (this.props.champion['championLevel'] == 7) { champ_rank_image = require("./../assets/images/champ_mastery/cm7.png") }
+    var champ_rank_image = require("./../../../assets/images/champ_mastery/cm1.png")
+    if (this.props.champion['championLevel'] == 1) { champ_rank_image = require("./../../../assets/images/champ_mastery/cm1.png") }
+    if (this.props.champion['championLevel'] == 2) { champ_rank_image = require("./../../../assets/images/champ_mastery/cm2.png") }
+    if (this.props.champion['championLevel'] == 3) { champ_rank_image = require("./../../../assets/images/champ_mastery/cm3.png") }
+    if (this.props.champion['championLevel'] == 4) { champ_rank_image = require("./../../../assets/images/champ_mastery/cm4.png") }
+    if (this.props.champion['championLevel'] == 5) { champ_rank_image = require("./../../../assets/images/champ_mastery/cm5.png") }
+    if (this.props.champion['championLevel'] == 6) { champ_rank_image = require("./../../../assets/images/champ_mastery/cm6.png") }
+    if (this.props.champion['championLevel'] == 7) { champ_rank_image = require("./../../../assets/images/champ_mastery/cm7.png") }
 
     return (
       <View style={{flexDirection: 'column', paddingTop: 8, paddingBottom: 8, flex:0.18, paddingLeft: 8, alignItems: 'center'}}>
@@ -137,9 +137,9 @@ class MatchListItems extends Component {
               </View>
               <View style={{flexDirection: 'row', paddingLeft: 70, marginTop: -10}}>
                 <Text style={{fontWeight: "700"}}>{item['stats']['totalMinionsKilled']+item['stats']['neutralMinionsKilled']}</Text>
-                <Image source={require("./../assets/images/cs.png")} style={{marginTop: 2, marginLeft: 3}}/>
+                <Image source={require("./../../../assets/images/cs.png")} style={{marginTop: 2, marginLeft: 3}}/>
                 <Text style={{marginLeft: 20, fontWeight: "700"}}>{numeral(item['stats']['goldEarned']).format('0,0')}</Text>
-                <Image source={require("./../assets/images/coin.png")} style={{marginTop: 2, marginLeft: 3}}/>
+                <Image source={require("./../../../assets/images/coin.png")} style={{marginTop: 2, marginLeft: 3}}/>
               </View>
             </View>
           </View>
